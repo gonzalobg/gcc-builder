@@ -9,6 +9,9 @@ PLUGINS=
 BINUTILS_GITURL=https://sourceware.org/git/binutils-gdb.git
 BINUTILS_VERSION=2.38
 BINUTILS_REVISION=$BINUTILS_VERSION
+
+MULTILIB_ENABLED="--enable-multilib"
+
 if echo "${VERSION}" | grep 'embed-trunk'; then
     VERSION=embed-trunk-$(date +%Y%m%d)
     URL=https://github.com/ThePhD/gcc.git
@@ -57,15 +60,22 @@ elif echo "${VERSION}" | grep 'gccrs-master'; then
     URL=https://github.com/Rust-GCC/gccrs.git
     BRANCH=master
     MAJOR=13
-    MAJOR_MINOR=11-trunk
+    MAJOR_MINOR=13-trunk
     # Only rust, this is intentional.
     LANGUAGES=rust
+elif echo "${VERSION}" | grep 'cobol-master'; then
+    VERSION=cobol-master-$(date +%Y%m%d)
+    URL=https://gitlab.cobolworx.com/COBOLworx/gcc-cobol.git
+    BRANCH="master+cobol"
+    MAJOR=13
+    MAJOR_MINOR=13-trunk
+    MULTILIB_ENABLED=" --disable-multilib"
 elif echo "${VERSION}" | grep 'trunk'; then
     VERSION=trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
     MAJOR=13
-    MAJOR_MINOR=12-trunk
+    MAJOR_MINOR=13-trunk
     LANGUAGES="${LANGUAGES},go,d,rust,m2"
 else
     MAJOR=$(echo "${VERSION}" | grep -oE '^[0-9]+')
@@ -162,7 +172,7 @@ CONFIG+=" --disable-bootstrap"
 CONFIG+=" --enable-multiarch"
 CONFIG+=" --with-abi=m64"
 CONFIG+=" --with-multilib-list=m32,m64,mx32"
-CONFIG+=" --enable-multilib"
+CONFIG+=" ${MULTILIB_ENABLED}"
 CONFIG+=" --enable-clocale=gnu"
 CONFIG+=" --enable-languages=${LANGUAGES}"
 CONFIG+=" --enable-ld=yes"
